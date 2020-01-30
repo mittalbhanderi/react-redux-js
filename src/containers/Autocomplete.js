@@ -162,7 +162,7 @@ class Autocomplete extends PureComponent {
             value={userInput}
           />
         </div>
-        <div className="list is-hoverable">{itemsListComponent}</div>
+        <div className="list is-hoverable" style={{maxHeight: 300, width: 350, overflow: 'auto'}}>{itemsListComponent}</div>
       </div>
     )
   }

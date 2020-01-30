@@ -11,6 +11,8 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY . .
 RUN yarn
 
+EXPOSE 3000
+
 # start app
 CMD ["yarn", "start"]
 
