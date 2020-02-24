@@ -5,15 +5,15 @@ import { increment, createNode, deleteNode, addChild, removeChild } from '../act
 describe('tree-view reducer', () => {
 
     it('shoud provide the initial state', () => {
-        expect (reducer(undefined, {})).toEqual({})
+        expect(reducer(undefined, {})).toEqual({})
     })
 
     it('should handle increment action', () => {
         const stateBefore = {
             'node_0': {
-                id: 'node_0',
+                nodeId: 'node_0',
                 counter: 0,
-                childIds: []
+                childNodeIds: []
             }
         }
 
@@ -21,9 +21,9 @@ describe('tree-view reducer', () => {
 
         const stateAfter = {
             'node_0': {
-                id: 'node_0',
+                nodeId: 'node_0',
                 counter: 1,
-                childIds: []
+                childNodeIds: []
             }
         }
 
@@ -35,21 +35,21 @@ describe('tree-view reducer', () => {
     })
 
     it('Should handle CREATE_NODE action', () => {
-      const stateBefore = {}
-      const action = createNode()
+        const stateBefore = {}
+        const action = createNode()
 
-      const stateAfter = {
-        [action.nodeId] : {
-          id: action.nodeId,
-          counter: 0,
-          childIds: []
+        const stateAfter = {
+            [action.nodeId]: {
+                nodeId: action.nodeId,
+                counter: 0,
+                childNodeIds: []
+            }
         }
-      }
 
-      deepFreeze(stateBefore)
-      deepFreeze(action)
+        deepFreeze(stateBefore)
+        deepFreeze(action)
 
-      expect(reducer(stateBefore, action)).toEqual(stateAfter)
+        expect(reducer(stateBefore, action)).toEqual(stateAfter)
     })
 
 

@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Counter component snapshot 1`] = `
+<div
+  incrementIfOdd={[MockFunction]}
+>
+  Clicked: 
+  0
+   times
+   
+  <button
+    onClick={[MockFunction]}
+  >
+    +
+  </button>
+   
+  <button
+    onClick={[MockFunction]}
+  >
+    -
+  </button>
+   
+  <button
+    onClick={[Function]}
+  >
+    Increment if odd
+  </button>
+   
+  <button
+    onClick={[MockFunction]}
+  >
+    Increment async
+  </button>
+</div>
+`;

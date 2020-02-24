@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 
 class Counter extends PureComponent {
 
+constructor(props) {
+  super(props);
+  this.incrementIfOdd = this.incrementIfOdd.bind(this);
+}
+
   static propTypes = {
     value: PropTypes.number.isRequired,
     onIncrement: PropTypes.func.isRequired,
@@ -10,7 +15,7 @@ class Counter extends PureComponent {
     onAsyncIncrement: PropTypes.func.isRequired
   }
 
-  incrementIfOdd = () => {
+  incrementIfOdd(){
     if (this.props.value % 2 !== 0) {
       this.props.onIncrement()
     }
