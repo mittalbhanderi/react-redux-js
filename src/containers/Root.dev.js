@@ -18,7 +18,7 @@ const Root = ({ store }) => (
         <Provider store={store}>
                 <div>
                         <Route path="/" exact={true} component={App} />
-                        <React.Suspense>
+                        <React.Suspense fallback={App}>
                                 <Route path="/counter" exact={true}
                                         component={CounterPage} />
                                 <Route path="/async" exact={true}
