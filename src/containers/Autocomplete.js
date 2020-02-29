@@ -1,171 +1,146 @@
-import React, { PureComponent } from 'react'
-import { Observable, pipe, of } from 'rxjs'
+import React, { useState } from "react";
 //import classnames from 'classnames'
 // you should import `lodash` as a whole module
-import lodash from 'lodash'
-import { streamProps, stream } from 'react-streams'
-import { withRouter } from 'react-router-dom'
-import { ajax } from 'rxjs/ajax'
-import { pluck, switchMap } from 'rxjs/operators'
+import lodash from "lodash";
+import { withRouter } from "react-router-dom";
 
-const ITEMS_API_URL = 'https://randomuser.me/api/?results=10&inc=name&seed='
-const DEBOUNCE_DELAY = 500
+const ITEMS_API_URL = "https://randomuser.me/api/?results=10&inc=name&seed=";
+const DEBOUNCE_DELAY = 500;
 
-const getAutoComplete = pipe(
-  switchMap(({ url, input }) => ajax(`${url}${input}`)),
-  pluck('results')
-)
+// const getAutoComplete = pipe(
+//   switchMap(({ url, input }) => ajax(`${url}${input}`)),
+//   pluck('results')
+// )
 
-const AutoComplete = streamProps(getAutoComplete)
+// const AutoComplete = streamProps(getAutoComplete)
 
 // the exported component can be either a function or a class
 
-class Autocomplete extends PureComponent {
-  constructor(props) {
-    super(props)
-    this.fetchItemsDebounced = lodash.debounce(this.fetchItems, DEBOUNCE_DELAY)
-    this.state = {
-      selectedItemIndex: 0,
-      items: [],
-      filteredItems: [],
-      showItems: false,
-      userInput: '',
-      error: ''
-    }
-    this.onChange$ = new Observable()
-  }
+function Autocomplete() {
 
-  fetchItems = () => {
-    const { userInput } = this.state
+  const [selectedItemIndex, setSelectedItemIndex] = useState(0);
+  const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [showItems, setShowItems] = useState(false);
+  const [userInput, setUserInput] = useState("");
+  const [error, setError] = useState("");
 
-    console.log('Calling fetch items with input ' + userInput)
+  function fetchItems() {
+    console.log("Calling fetch items with input " + userInput);
 
     fetch(ITEMS_API_URL + userInput)
       .then(response => response.json())
       .then(
         json => {
-          let { items } = this.state
+          let data = items || [];
           json.results.map(result => {
-            if (!items.includes(result.name.first + ' ' + result.name.last)) {
-              items.push(result.name.first + ' ' + result.name.last)
+            if (!data.includes(result.name.first + " " + result.name.last)) {
+              data.push(result.name.first + " " + result.name.last);
             }
-          })
+          });
+          
+          setItems(data);
 
           const filteredItems = lodash.filter(
-            items,
+            data,
             item => item.toLowerCase().indexOf(userInput.toLowerCase()) > -1
-          )
+          );
 
-          console.log('filtered items length is - ' + filteredItems.length)
+          console.log("filtered items length is - " + filteredItems.length);
 
-          this.setState({
-            selectedItemIndex: 0,
-            filteredItems: filteredItems,
-            showItems: true
-          })
+          setSelectedItemIndex(0);
+          setFilteredItems(filteredItems);
+          setShowItems(true);
         },
         error => {
-          this.setState({ showItems: false, error })
+          setShowItems(false);
+          setError(error);
         }
-      )
-  }
+      );
+  };
 
-  componentDidMount() {
-    this.fetchItemsDebounced()
-  }
+  const onChange = e => {
+    const userInput = e.currentTarget.value;
+    console.log("Change detected: " + userInput);
+    setUserInput(e.currentTarget.value);
+    lodash.debounce(fetchItems, DEBOUNCE_DELAY)();
+  };
 
-  onChange = e => {
-    const userInput = e.currentTarget.value
-    console.log('Change detected: ' + userInput)
-    this.setState({ userInput: e.currentTarget.value })
-    this.fetchItemsDebounced()
-  }
-
-  onKeyDown = e => {
-    const { selectedItemIndex, filteredItems } = this.state
+  const onKeyDown = e => {
     if (e.keyCode === 13) {
-      this.setState({
-        selectedItemIndex: 0,
-        showItems: false,
-        userInput: filteredItems[selectedItemIndex]
-      })
+      setSelectedItemIndex(0);
+      setShowItems(false);
+      setUserInput(filteredItems[selectedItemIndex]);
     } else if (e.keyCode === 38) {
       if (selectedItemIndex === 0) {
-        return
+        return;
       }
-      this.setState({ selectedItemIndex: selectedItemIndex - 1 })
+      setSelectedItemIndex(selectedItemIndex - 1);
     } else if (e.keyCode === 40) {
       if (selectedItemIndex - 1 === filteredItems.length) {
-        return
+        return;
       }
-
-      this.setState({ selectedItemIndex: selectedItemIndex + 1 })
+      setSelectedItemIndex(selectedItemIndex + 1);
     }
-  }
+  };
 
-  onClick = e => {
-    this.setState({
-      selectedItemIndex: 0,
-      filteredItems: [],
-      showItems: false,
-      userInput: e.currentTarget.innerText
-    })
-  }
+  const onClick = e => {
+    setSelectedItemIndex(0);
+    setFilteredItems([]);
+    setShowItems(false);
+    setUserInput(e.currentTarget.innerText);
+  };
 
-  render() {
-    const {
-      onChange,
-      onClick,
-      onKeyDown,
-      state: { selectedItemIndex, showItems, filteredItems, userInput }
-    } = this
+  let itemsListComponent;
 
-    let itemsListComponent
-
-    if (showItems && userInput) {
-      if (filteredItems.length > 0) {
-        itemsListComponent = (
-          <ul className="items">
-            {filteredItems.map((item, index) => {
-              let className
-              if (index === selectedItemIndex) {
-                className = 'item-active'
-              }
-              return (
-                <li className={className} key={item} onClick={onClick}>
-                  {item}
-                </li>
-              )
-            })}
-          </ul>
-        )
-      } else {
-        itemsListComponent = (
-          <div className="no-items">
-            <em>No items to list!</em>
-          </div>
-        )
-      }
-    }
-
-    return (
-      <div className="wrapper">
-        <h1>Auto complete demo:</h1>
-        <div className="control p10">
-          <label htmlFor="user-input">Please specify a name: </label>
-          <input
-            type="text"
-            name="user-input"
-            className="input"
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-            value={userInput}
-          />
+  if (showItems && userInput) {
+    if (filteredItems.length > 0) {
+      itemsListComponent = (
+        <ul className="items">
+          {filteredItems.map((item, index) => {
+            let className;
+            if (index === selectedItemIndex) {
+              className = "item-active";
+            }
+            return (
+              <li className={className} key={item} onClick={onClick}>
+                {item}
+              </li>
+            );
+          })}
+        </ul>
+      );
+    } else {
+      itemsListComponent = (
+        <div className="no-items">
+          <em>No items to list!</em>
         </div>
-        <div className="list is-hoverable" style={{maxHeight: 300, width: 350, overflow: 'auto'}}>{itemsListComponent}</div>
-      </div>
-    )
+      );
+    }
   }
-}
 
-export default withRouter(Autocomplete)
+  return (
+    <div className="wrapper">
+      <h1>Auto complete demo:</h1>
+      <div className="control p10">
+        <label htmlFor="user-input">Please specify a name: </label>
+        <input
+          type="text"
+          name="user-input"
+          className="input"
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+          value={userInput}
+        />
+      </div>
+      <div
+        className="list is-hoverable"
+        style={{ maxHeight: 300, width: 350, overflow: "auto" }}
+      >
+        {itemsListComponent}
+      </div>
+    </div>
+  );
+};
+
+export default withRouter(Autocomplete);
