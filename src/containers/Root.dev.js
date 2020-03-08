@@ -11,7 +11,7 @@ const AsyncPage = React.lazy(() => import('./AsyncPage'))
 const CounterPage = React.lazy(() => import('./CounterPage'))
 //import AsyncPage from './AsyncPage'
 const ShoppingCart = React.lazy(() => import('./ShoppingCart'))
-const NodeContainer = React.lazy(() => import('./NodeContainer'))
+const NodeContainer = React.lazy(() => import('./Node'))
 const Autocomplete = React.lazy(() => import('./Autocomplete'))
 
 const Root = ({ store }) => (
@@ -26,7 +26,7 @@ const Root = ({ store }) => (
                                 <Route path="/shopping" exact={true}
                                         component={ShoppingCart} />
                                 <Route path="/tree-view" exact={true}
-                                        component={NodeContainer} />
+                                        component={() => <NodeContainer /> } />
                                 <Route path="/auto-complete" exact={true}
                                         component={Autocomplete} />
                                 {/* <Route path="/:login/:name"

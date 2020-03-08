@@ -1,69 +1,82 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import * as actions from '../actions/tree-view'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import * as actions from "../actions/tree-view";
+import { withRouter } from "react-router-dom";
 
-export class NodeContainer extends Component {
-  handleIncrementClick = () => {
-    const { increment, id } = this.props
-    increment(id)
-  }
+export const NodeContainer = (props) => {
 
-  handleAddChildClick = e => {
-    e.preventDefault()
-    const { addChild, createNode, id } = this.props
-    const childId = createNode().nodeId
-    addChild(id, childId)
-  }
+  const handleIncrementClick = e => {
+    e.preventDefault();
+    const { increment, id } = props;
+    increment(id);
+  };
 
-  handleRemoveClick = e => {
-    e.preventDefault()
+  const handleAddChildClick = e => {
+    e.preventDefault();
+    const { addChild, createNode, id } = props;
+    const childId = createNode().nodeId;
+    addChild(id, childId);
+  };
 
-    const { removeChild, deleteNode, parentId, id } = this.props
-    removeChild(parentId, id)
-    deleteNode(id)
-  }
+  const handleRemoveClick = e => {
+    e.preventDefault();
 
-  renderChild = childId => {
-    const { id } = this.props
+    const { removeChild, deleteNode, parentId, id } = props;
+    removeChild(parentId, id);
+    deleteNode(id);
+  };
+
+  const renderChild = childId => {
+    const { id } = props;
     return (
       <li key={childId}>
         <ConnectedNode id={childId} parentId={id} />
       </li>
-    )
-  }
+    );
+  };
 
-  render() {
-    const { counter, parentId, childNodeIds } = this.props
-    return (
-      <div>
-        Counter: {counter}
-        {' '}
-        <button onClick={this.handleIncrementClick}>
+  const { counter, parentId, childNodeIds } = props;
+
+  return (
+    <div>
+      <summary>
+        Counter: {counter}{" "}
+        <button data-testid="increment" onClick={handleIncrementClick}>
           +
-            </button>
-        {' '}
-        {typeof parentId !== 'undefined' &&
-          <a href="#" onClick={this.handleRemoveClick} // eslint-disable-line jsx-a11y/anchor-is-valid
-            style={{ color: 'lightgray', textDecoration: 'none' }}>
-            XXXX
-              </a>
-        }
-          <ul>
-            {childNodeIds.map(this.renderChild)}
-            <li key="add">
-              <a href="#" // eslint-disable-line jsx-a11y/anchor-is-valid
-                onClick={this.handleAddChildClick}
-              >Add child</a>
-            </li>
-          </ul>
-      </div>
-    )
-  }
-}
+        </button>{" "}
+      </summary>
+      {typeof parentId !== "undefined" && (
+        <a
+          data-testid="remove"
+          href="#"
+          onClick={handleRemoveClick} // eslint-disable-line jsx-a11y/anchor-is-valid
+          style={{ color: "lightgray", textDecoration: "none" }}
+        >
+          Remove child
+        </a>
+      )}
+      <ul>
+        {childNodeIds && childNodeIds.map(renderChild)}
+        <li key="add">
+          <a
+            href="#" // eslint-disable-line jsx-a11y/anchor-is-valid
+            data-testid="add"
+            onClick={handleAddChildClick}
+          >
+            Add child
+          </a>
+        </li>
+      </ul>
+    </div>
+  );
+};
 
 const mapStateToProps = (state, ownProps) => {
-  return state.nodes[ownProps.id]
-}
+  return {
+    ...state.nodes[ownProps.id || 0],
+    id: ownProps.id || 0
+  };
+};
 
-const ConnectedNode = connect(mapStateToProps, actions)(NodeContainer)
-export default ConnectedNode
+const ConnectedNode = connect(mapStateToProps, actions)(NodeContainer);
+export default withRouter(ConnectedNode);

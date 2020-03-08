@@ -18,12 +18,7 @@ function solution(A) {
   }
 
   while (maxLength != resultLength) {
-    if (
-      routeMap.length > 1 &&
-      minLength &&
-      maxLength &&
-      minLength == maxLength
-    ) {
+    if (routeMap.length > 1 && minLength && maxLength && minLength == maxLength) {
       routeMap = routeMap.filter(ele => ele.result == maxValue);
     }
 
@@ -32,31 +27,20 @@ function solution(A) {
 
     for (const route of routeMap) {
       trailFromTop = false;
-      
+
       if (routeMap.length > 2 && route.result.length == maxLength) {
         continue;
       }
-      for (
-        let rowPosition = route.rowIndex;
-        rowPosition < totalRows;
-        rowPosition++
-      ) {
+      for (let rowPosition = route.rowIndex; rowPosition < totalRows; rowPosition++) {
         if (trailFromTop) {
           break;
         }
         route.rowIndex = rowPosition;
-        for (
-          let colPosition = route.colIndex;
-          colPosition < totalColumns;
-          colPosition++
-        ) {
+        for (let colPosition = route.colIndex; colPosition < totalColumns; colPosition++) {
           route.colIndex = colPosition;
           route.result = route.result + "" + A[rowPosition][colPosition];
 
-          if (
-            maxValue < route.result ||
-            maxValue.length < route.result.length
-          ) {
+          if (maxValue < route.result || maxValue.length < route.result.length) {
             maxValue = route.result;
           }
 
@@ -64,39 +48,35 @@ function solution(A) {
           minLength = Math.min(minLength, route.result.length);
 
           if (rowPosition + 1 < totalRows && colPosition + 1 < totalColumns) {
-            if (
-              A[rowPosition + 1][colPosition] > A[rowPosition][colPosition + 1]
-            ) {
+            if (A[rowPosition + 1][colPosition] > A[rowPosition][colPosition + 1]) {
               route.rowIndex = rowPosition + 1;
               trailFromTop = true;
               break;
             }
-            if (
-              A[rowPosition + 1][colPosition] == A[rowPosition][colPosition + 1]
-            ) {
-              let validPath = false;
-              if (colPosition + 1 < totalColumns) {
-                let value = A[rowPosition + 1][colPosition];
-                for (let i = rowPosition + 1; i < totalRows; i++) {
-                  if (
-                    value != A[i][colPosition] ||
-                    value != A[i][colPosition + 1]
-                  ) {
-                    validPath = true;
-                    break;
-                  }
-                }
-              } else {
-                validPath = true;
-              }
+            if (A[rowPosition + 1][colPosition] == A[rowPosition][colPosition + 1]) {
+              //let validPath = true;
+              // comparing two columns if (colPosition + 1 < totalColumns) {
+              // let value = A[rowPosition + 1][colPosition];
+              // for (let i = rowPosition + 1; i < totalRows; i++) {
+              //   if (
+              //     value != A[i][colPosition] ||
+              //     value != A[i][colPosition + 1]
+              //   ) {
+              //     validPath = true;
+              //     break;
+              //   }
+              // }
+              // } else {
+              //   validPath = true;
+              // }
 
               if (
-                validPath &&
+                //validPath &&
                 routeMap.filter(
-                  route =>
-                    route.rowIndex == rowPosition + 1 &&
-                    route.colIndex == colPosition
-                ).length === 0
+                  r =>
+                    r.rowIndex == rowPosition + 1 &&
+                    r.colIndex == colPosition
+                ).length == 0
               ) {
                 routeMap.push({
                   rowIndex: rowPosition + 1,
@@ -138,6 +118,15 @@ const checkAllSame = (A, totalRows, totalColumns) => {
 
 
 A = [
+  [9, 9, 7],
+  [9, 7, 2],
+  [9, 9, 5],
+  [9, 1, 2]
+]
+
+console.log(solution(A));
+
+A = [
     [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,9,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,9],
     [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
     [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
@@ -166,15 +155,6 @@ A = [
     [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
     [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,9,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
 ]
-console.log(solution(A));
-
-A = [
-    [9, 9, 7],
-    [9, 7, 2],
-    [9, 9, 5],
-    [9, 1, 2]
-]
-
 console.log(solution(A));
 
 A =   [

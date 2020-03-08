@@ -1,71 +1,109 @@
-import React from 'react'
-import { shallow } from 'enzyme'
-import ConnectedNode, { NodeContainer } from './Node'
+import React from "react";
+import { NodeContainer } from "./Node";
+import { render, unmountComponentAtNode } from "react-dom";
+import { act } from "react-dom/test-utils";
 
-function setup(id, counter, childNodeIds, parentId) {
-    const actions =  {
-        increment: jest.fn(), 
-        removeChild: jest.fn(),
-        deleteNode: jest.fn(), 
-        createNode: jest.fn(),
-        addChild: jest.fn()
-    }
+describe("Node Container Component Tests", () => {
+  let container = null;
+
+  beforeEach(() => {
+    // setup a DOM element as a render target
+    container = document.createElement("div");
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    // cleanup on exiting
+    unmountComponentAtNode(container);
+    container.remove();
+    container = null;
+  });
+
+  async function setup(id, counter, childNodeIds, parentId) {
+    const actions = {
+      increment: jest.fn(),
+      removeChild: jest.fn(),
+      deleteNode: jest.fn(),
+      createNode: jest.fn(),
+      addChild: jest.fn(),
+      store: jest.fn()
+    };
 
     const eventArgs = {
-        preventDefault: jest.fn()
-    }
+      preventDefault: jest.fn()
+    };
 
-    const component = shallow(
-        <NodeContainer id={id} counter={counter} parentId={parentId} childNodeIds={childNodeIds} {...actions} />
-    )
+    return new Promise(resolve => {
+      act(() => {
+        render(
+          <NodeContainer
+            id={id}
+            counter={counter}
+            parentId={parentId}
+            childNodeIds={childNodeIds}
+            {...actions}
+          />,
+          container
+        );
 
-    return {
-        component: component,
-        removeLink: component.findWhere(n => n.type() === 'a' && n.contains('XXXX')),
-        addLink: component.findWhere(n => n.type() === 'a' && n.contains('Add child')),
-        button: component.find('button'),
-        childNodes: component.find(ConnectedNode),
-        actions: actions,
-        eventArgs: eventArgs
-    }
-}
+        resolve({
+          component: container,
+          removeLink: container.querySelector("[data-testid=remove]"),
+          addLink: container.querySelector("[data-testid=add]"),
+          button: container.querySelector("[data-testid=increment]"),
+          actions: actions,
+          eventArgs: eventArgs
+        });
+      });
+    });
+  }
 
-describe('Node Container Component Tests', () => {
+  it("should display counter", () => {
+    setup(1, 23, []).then(({ component, addLink }) => {
+      expect(component.innerHTML).toContain("Counter: 23");
+      expect(addLink.innerHTML).toEqual("Add child");
+    });
+  });
 
-    it('should display counter', () => {
-        const { component } = setup(1, 23, [])
-        expect(component.text()).toMatch(/^Counter: 23/)
-    })
+  it("should call increment button", () => {
+    setup(1, 2, []).then(({ button, actions }) => {
+      act(() => {
+        button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      });
+      expect(actions.increment).toBeCalledWith(1);
+    });
+  });
 
-    it('should call increment button', () => {
-        const { button, actions } = setup(1,2, [])
-        button.simulate('click')
+  it("should not render remove link", () => {
+    setup(1, 2, []).then(({ removeLink }) => {
+      expect(removeLink).toBeNull();
+    });
+  });
 
-        expect(actions.increment).toBeCalledWith(1)
-    })
+  it("should call createNode action on Add child click", () => {
+    setup(2, 1)
+      .then(({ addLink, actions, eventArgs }) => {
+        actions.createNode.mockReturnValue({ nodeId: 3 });
+        act(() => {
+          addLink.dispatchEvent(
+            new MouseEvent("click", { eventArgs, bubbles: true })
+          );
+        });
+        expect(actions.createNode).toBeCalled();
+      });
+  });
 
-    it('should not render remove link', () => {
-        const { removeLink } = setup(1, 2, [])
-        expect(removeLink.length).toEqual(0)
-    })
-
-    it('should call createNode action on Add child click', () => {
-        const { addLink, actions, eventArgs } = setup(2, 1, ['node_0'])
-        actions.createNode.mockReturnValue({ nodeId: 3 })
-
-        addLink.simulate('click', eventArgs)
-
-        expect(actions.createNode).toBeCalled()
-    })
-
-    it('should call deleteNode action on Remove click', () => {
-        const { removeLink, actions, eventArgs } = setup(2, 1, [3,4], 2)
-        
-        removeLink.simulate('click', eventArgs)
-
-        expect(actions.removeChild).toBeCalled()
-
-    })
-
-
-})
+  it("should call deleteNode action on Remove click", () => {
+    setup(2, 1, [3, 4])
+      .then(({ component, removeLink, actions, eventArgs }) => {
+          console.log(component.innerHTML);
+          
+        act(() => {
+          removeLink.dispatchEvent(
+            new MouseEvent("click", { eventArgs, bubbles: true })
+          );
+        });
+        expect(actions.removeChild).toBeCalled();
+      });
+  });
+});

@@ -60,32 +60,31 @@ each element of array A is an integer within the range [0..1,000,000,000].
 */
 
 function Solution(A) {
-  let result = 0
-  let goingUp
-  let i = 0
-  let peaksAtIndexes = []
-  let maxDistance
+  let result = 0;
+  let goingUp;
+  let i = 0;
+  let peaksAtIndexes = [];
+  let maxDistance;
 
   if (A.length > 2) {
     while (A[i] == A[i + 1] && i < A.length) {
-      i++
+      i++;
     }
 
     if (i + 1 < A.length && A[i] > A[i + 1]) {
-      peaksAtIndexes.push(i)
-      maxDistance = i
-      goingUp = false
+      peaksAtIndexes.push(i);
+      goingUp = false;
     } else {
-      goingUp = true
+      goingUp = true;
     }
 
     for (i; i < A.length; i++) {
       if (i + 2 <= A.length) {
         if (goingUp) {
           while (i + 2 <= A.length && A[i] <= A[i + 1]) {
-            i++
+            i++;
           }
-          if(i == A.length - 1){
+          if (i == A.length - 1) {
             break;
           }
           if (peaksAtIndexes.length > 0) {
@@ -95,44 +94,45 @@ function Solution(A) {
             ) {
               maxDistance = Math.abs(
                 peaksAtIndexes[peaksAtIndexes.length - 1] - i
-              )
+              );
             }
           } else {
-            maxDistance = i
+            maxDistance = i;
           }
-          peaksAtIndexes.push(i)
-          goingUp = false
-          i--
+          peaksAtIndexes.push(i);
+          goingUp = false;
+          i--;
         } else {
           while (i + 2 <= A.length && A[i] >= A[i + 1]) {
-            i++
+            i++;
           }
-          if(i == A.length - 1) {
+          if (i == A.length - 1) {
             break;
           }
-          goingUp = true
-          i--
+          goingUp = true;
+          i--;
         }
       } else {
-        break
+        break;
       }
     }
   }
   if (peaksAtIndexes.length > 0) {
-    result = 1
+    result = 1;
     if (peaksAtIndexes.length > 1) {
       for (let j = 1; j < peaksAtIndexes.length; j++) {
         if (peaksAtIndexes[j] >= result * maxDistance) {
-          result += 1
+          result += 1;
         }
       }
     }
   }
-  return result
+  return result;
 }
 
-let A = [1, 2, 3, 4, 5, 6]
 
-A = [20, 5, 5, 5, 5, 5, 5, 5, 5, 10]
+let A = [1, 2, 3, 4, 5, 6];
 
-console.log(Solution(A))
+A = [20, 5, 5, 5, 5, 5, 5, 5, 5, 10];
+
+console.log(Solution(A));

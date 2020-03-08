@@ -38,7 +38,7 @@ function Autocomplete() {
               data.push(result.name.first + " " + result.name.last);
             }
           });
-          
+
           setItems(data);
 
           const filteredItems = lodash.filter(
@@ -52,9 +52,10 @@ function Autocomplete() {
           setFilteredItems(filteredItems);
           setShowItems(true);
         },
-        error => {
+        err => {
           setShowItems(false);
-          setError(error);
+          setError(err);
+          console.error(error);
         }
       );
   };

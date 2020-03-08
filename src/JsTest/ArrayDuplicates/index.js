@@ -57,7 +57,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
-populateMatrix(1000000, 99999)
+populateMatrix(1000000, 999999)
 let result = solution(A)
 
 console.log(result)
