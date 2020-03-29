@@ -79,4 +79,7 @@ function SolutionB(A, k) {
 let A = [5, 11, 3, 50, 60, 90];
 let K = 3;
 
+A = [5, 2, 4, 0, 1];
+K = 2;
+
 console.log(SolutionB(A, K));
