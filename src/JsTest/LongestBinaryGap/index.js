@@ -38,9 +38,7 @@ function solution(N) {
               }
           }
       }
-
       return longestBinaryGap;
-
   }
   return 0;
 }
